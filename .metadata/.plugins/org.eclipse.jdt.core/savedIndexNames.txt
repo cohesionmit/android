@@ -1,0 +1,9 @@
+INDEX VERSION 1.127+C:\Users\Sophia\Desktop\21W.789\android\.metadata\.plugins\org.eclipse.jdt.core
+1797818229.index
+1380926990.index
+2413404043.index
+848856923.index
+1796599342.index
+762525357.index
+1284074322.index
+430659840.index
