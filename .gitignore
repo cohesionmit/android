@@ -33,3 +33,6 @@ Cohesion/proguard/
 *.ipr
 *.iws
 .idea/
+
+# Probably don't need to share Eclipse-specific stuff at all?
+.metadata/
