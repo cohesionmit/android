@@ -32,11 +32,14 @@ GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener 
 	private GoogleApiClient mGoogleApiClient;
 	private LocationRequest mLocationRequest;
     private boolean mInProgress = false;
-    private boolean mServicesAvailable = false;
     
     @Override
 	public void onCreate() {
         super.onCreate();
+        
+        if (!checkServices()) {
+        	return;
+        }
         
         NotificationCompat.Builder notificationBuilder =
     	        new NotificationCompat.Builder(this)
@@ -71,14 +74,12 @@ GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener 
 				.setInterval(UPDATE_FREQ)
 				.setFastestInterval(FASTEST_UPDATE_FREQ)
 				.setSmallestDisplacement(0);
-        
-        mServicesAvailable = checkServices();
     }
     
     public int onStartCommand(Intent intent, int flags, int startId) {
     	super.onStartCommand(intent, flags, startId);
 
-    	if (!mServicesAvailable || mGoogleApiClient.isConnected() || mInProgress) {
+    	if (!checkServices() || mGoogleApiClient.isConnected() || mInProgress) {
     		return START_STICKY;
     	}
     	
@@ -114,7 +115,7 @@ GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener 
         mInProgress = false;
         hideNotification();
         
-        if(mServicesAvailable && mGoogleApiClient != null) {
+        if(checkServices() && mGoogleApiClient != null) {
         	LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
         	mGoogleApiClient.disconnect();
 	        mGoogleApiClient = null;
@@ -139,6 +140,8 @@ GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener 
 		if (resultCode == ConnectionResult.SUCCESS) {
 			return true;
 		} else {
+			// This service cannot function without Play Services
+			stopSelf();
 			return false;
 		}
 	}
