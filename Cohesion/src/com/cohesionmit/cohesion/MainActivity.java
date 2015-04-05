@@ -49,8 +49,7 @@ public class MainActivity extends ActionBarActivity {
             	                   GraphResponse response) {
             	                String name;
 								try {
-									name = object.get("id").toString();
-									username.setText("You are currently logged in as " + name);
+									username.setText(object.get("id").toString());
 								} catch (JSONException e) {
 									// TODO Auto-generated catch block
 									e.printStackTrace();

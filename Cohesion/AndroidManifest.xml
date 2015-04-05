@@ -29,6 +29,7 @@
         
         <activity
             android:name=".NotificationHandler"
+            android:excludeFromRecents="true"
             android:exported="true" >
         </activity>
         
