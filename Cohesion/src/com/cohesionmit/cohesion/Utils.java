@@ -63,8 +63,8 @@ public class Utils {
 		
 		JSONObject json = new JSONObject();
 		try {
-			json.put("firstName", firstName);
-			json.put("lastName", lastName);
+			json.put("firstname", firstName);
+			json.put("lastname", lastName);
 			json.put("fburl", link);
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
