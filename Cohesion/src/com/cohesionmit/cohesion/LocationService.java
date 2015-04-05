@@ -13,15 +13,19 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 
 
 public class LocationService extends Service implements LocationListener,
 GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+	
+	public final static String ONLINE_KEY = "online";
 	
 	private final static int UPDATE_FREQ = 1000 * 30;
 	private final static int FASTEST_UPDATE_FREQ = 1000 * 5;
@@ -78,8 +82,14 @@ GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener 
     
     public int onStartCommand(Intent intent, int flags, int startId) {
     	super.onStartCommand(intent, flags, startId);
+    	
+    	if (mNotification == null || mNotificationManager == null
+    			|| mGoogleApiClient == null || mLocationRequest == null) {
+    		stopSelf();
+    		return START_NOT_STICKY;
+    	}
 
-    	if (!checkServices() || mGoogleApiClient.isConnected() || mInProgress) {
+    	if (mGoogleApiClient.isConnected() || mInProgress) {
     		return START_STICKY;
     	}
     	
@@ -115,7 +125,7 @@ GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener 
         mInProgress = false;
         hideNotification();
         
-        if(checkServices() && mGoogleApiClient != null) {
+        if(mGoogleApiClient != null) {
         	LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
         	mGoogleApiClient.disconnect();
 	        mGoogleApiClient = null;
@@ -131,8 +141,21 @@ GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener 
     
     @Override
 	public void onLocationChanged(Location location) {
-		// TODO
+		sendLocation(location);
 	}
+    
+    public void refreshLocation() {
+    	if (mGoogleApiClient != null) {
+    		Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        	sendLocation(location);
+    	}
+    }
+    
+    private void sendLocation(Location location) {
+    	if (location != null) {
+			// TODO
+		}
+    }
     
     private boolean checkServices() {
 		int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
@@ -147,12 +170,14 @@ GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener 
 	}
     
     public void showNotification() {
-    	if (mInProgress) {
+    	if (mInProgress && mNotificationManager != null && mNotification != null) {
     		mNotificationManager.notify(NOTIFICATION_ID, mNotification);
     	}
     }
     
     public void hideNotification() {
-    	mNotificationManager.cancel(NOTIFICATION_ID);
+    	if (mNotificationManager != null) {
+    		mNotificationManager.cancel(NOTIFICATION_ID);
+    	}
     }
 }

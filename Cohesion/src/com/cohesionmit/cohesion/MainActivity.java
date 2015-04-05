@@ -118,8 +118,8 @@ public class MainActivity extends ActionBarActivity {
     protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
     	super.onActivityResult(requestCode, resultCode, data);
     	callbackManager.onActivityResult(requestCode, resultCode, data);
-   }
-    
+    }
+
     private boolean checkPlayServices() {
 		int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
 

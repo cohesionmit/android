@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-public class BootReceiver extends BroadcastReceiver {
+public class KeepaliveReceiver extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction())) {
