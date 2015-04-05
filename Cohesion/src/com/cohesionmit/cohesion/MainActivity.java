@@ -4,7 +4,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.support.v7.app.ActionBarActivity;
+import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,11 +28,13 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 public class MainActivity extends ActionBarActivity {
 	
 	private CallbackManager callbackManager;
+	private Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        FacebookSdk.sdkInitialize(getApplicationContext());
+        context = getApplicationContext();
+        FacebookSdk.sdkInitialize(context);
         setContentView(R.layout.activity_main);
         LoginButton loginButton = (LoginButton) findViewById(R.id.login_button);
         final TextView username = (TextView) findViewById(R.id.username);
@@ -52,6 +56,9 @@ public class MainActivity extends ActionBarActivity {
             	                	String lastName = object.get("last_name").toString();
             	                	String link = object.get("link").toString();
 									username.setText(link);
+									
+									Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(link));
+									startActivity(browserIntent);
 								} catch (JSONException e) {
 									// TODO Auto-generated catch block
 									e.printStackTrace();

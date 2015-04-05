@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -13,19 +14,17 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.protocol.HTTP;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.net.Uri;
+import android.location.Location;
 import android.os.AsyncTask;
 
 public class Utils {
@@ -59,27 +58,85 @@ public class Utils {
 		editor.commit();
 	}
 	
-	public static void openURL(Context ctx, String url) {
-		Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-		ctx.startActivity(browserIntent);
+	public void register(String firstName, String lastName, String link, ResponseHandler handler) {
+		HttpPost request = new HttpPost(APP_URL + "/api/register");
+		
+		JSONObject json = new JSONObject();
+		try {
+			json.put("firstName", firstName);
+			json.put("lastName", lastName);
+			json.put("fburl", link);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		sendPost(request, json, handler);
 	}
 	
-	public static void getHTTP(String url, ResponseHandler handler) {
-		checkClient();
-		HttpGet request = new HttpGet(url);
-		sendRequest(request, handler);
+	public void near(String link, int limit, ResponseHandler handler) {
+		HttpPost request = new HttpPost(APP_URL + "/api/near");
+		
+		JSONObject json = new JSONObject();
+		try {
+			json.put("fburl", link);
+			json.put("limit", limit);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		sendPost(request, json, handler);
 	}
 	
-	public static void postHTTP(String url, ResponseHandler handler) {
-		checkClient();
-		HttpPost request = new HttpPost(url);
-		sendRequest(request, handler);
+	public void location(String link, Location loc, ResponseHandler handler) {
+		HttpPost request = new HttpPost(APP_URL + "/api/location");
+		
+		JSONObject json = new JSONObject();
+		try {
+			json.put("fburl", link);
+			json.put("latitude", loc.getLatitude());
+			json.put("longitude", loc.getLongitude());
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		sendPost(request, json, handler);
 	}
 	
-	public static void putHTTP(String url, ResponseHandler handler) {
-		checkClient();
-		HttpPut request = new HttpPut(url);
-		sendRequest(request, handler);
+	public void setClasses(String link, Map<String, String> classes, ResponseHandler handler) {
+		HttpPost request = new HttpPost(APP_URL + "/api/setclasses");
+		
+		JSONObject classJSON = new JSONObject();
+		JSONObject json = new JSONObject();
+		try {
+			for (Map.Entry<String, String> e : classes.entrySet()) {
+				classJSON.put(e.getKey(), e.getValue());
+			}
+			
+			json.put("fburl", link);
+			json.put("classes", classJSON);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		sendPost(request, json, handler);
+	}
+	
+	public void getClasses(String link, ResponseHandler handler) {
+		HttpPost request = new HttpPost(APP_URL + "/api/getclasses");
+		
+		JSONObject json = new JSONObject();
+		try {
+			json.put("fburl", link);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		sendPost(request, json, handler);
 	}
 	
 	private static Map<String, String> classSetToMap(Set<String> set) {
@@ -103,8 +160,18 @@ public class Utils {
 		return classSet;
 	}
 	
-	private static void sendRequest(HttpUriRequest request, ResponseHandler handler) {
-		new RequestTask(request, handler).execute();
+	private static void sendPost(HttpPost request, JSONObject json, ResponseHandler handler) {
+		checkClient();
+		
+		try {
+			StringEntity entity = new StringEntity(json.toString(), HTTP.UTF_8);
+			entity.setContentType("application/json");
+			request.setEntity(entity);
+			new RequestTask(request, handler).execute();
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	private static void checkClient() {
