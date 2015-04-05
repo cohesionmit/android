@@ -1,17 +1,84 @@
 package com.cohesionmit.cohesion;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.support.v7.app.ActionBarActivity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
+
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 
 
 public class MainActivity extends ActionBarActivity {
+	
+	private CallbackManager callbackManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_main);
+        LoginButton loginButton = (LoginButton) findViewById(R.id.login_button);
+        final TextView username = (TextView) findViewById(R.id.username);
+        callbackManager = CallbackManager.Factory.create();
+        loginButton.setReadPermissions("public_profile");
+        // Callback registration
+        loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+            	GraphRequest request = GraphRequest.newMeRequest(
+            	        loginResult.getAccessToken(),
+            	        new GraphRequest.GraphJSONObjectCallback() {
+            	            @Override
+            	            public void onCompleted(
+            	                   JSONObject object,
+            	                   GraphResponse response) {
+            	                String name;
+								try {
+									name = object.get("id").toString();
+									username.setText("You are currently logged in as " + name);
+								} catch (JSONException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+            	            }
+            	        });
+            	Bundle parameters = new Bundle();
+            	parameters.putString("fields", "id,name,link");
+            	request.setParameters(parameters);
+            	request.executeAsync();
+            }
+
+            @Override
+            public void onCancel() {
+                // App code
+            }
+
+            @Override
+            public void onError(FacebookException exception) {
+                // App code
+            }
+        });
+        
+        AccessToken token = AccessToken.getCurrentAccessToken();
+        if (token == null) {
+        	username.setText("No login");
+        } else {
+        	username.setText("Logged in");
+        }
+        
     }
 
 
@@ -33,4 +100,10 @@ public class MainActivity extends ActionBarActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+    
+    @Override
+    protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+    	super.onActivityResult(requestCode, resultCode, data);
+    	callbackManager.onActivityResult(requestCode, resultCode, data);
+   }
 }
