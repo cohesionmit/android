@@ -19,6 +19,8 @@ import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -79,6 +81,9 @@ public class MainActivity extends ActionBarActivity {
         	username.setText("Logged in");
         }
         
+        if (checkPlayServices()) {
+        	startService(new Intent(this, LocationService.class));
+        }
     }
 
 
@@ -106,4 +111,15 @@ public class MainActivity extends ActionBarActivity {
     	super.onActivityResult(requestCode, resultCode, data);
     	callbackManager.onActivityResult(requestCode, resultCode, data);
    }
+    
+    private boolean checkPlayServices() {
+		int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+
+		if (resultCode == ConnectionResult.SUCCESS) {
+			return true;
+		} else {
+			GooglePlayServicesUtil.getErrorDialog(resultCode, this, 0).show();
+			return false;
+		}
+	}
 }
