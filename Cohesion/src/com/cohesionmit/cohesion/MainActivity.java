@@ -47,9 +47,11 @@ public class MainActivity extends ActionBarActivity {
             	            public void onCompleted(
             	                   JSONObject object,
             	                   GraphResponse response) {
-            	                String name;
-								try {
-									username.setText(object.get("id").toString());
+            	                try {
+            	                	String firstName = object.get("first_name").toString();
+            	                	String lastName = object.get("last_name").toString();
+            	                	String link = object.get("link").toString();
+									username.setText(link);
 								} catch (JSONException e) {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
@@ -57,7 +59,7 @@ public class MainActivity extends ActionBarActivity {
             	            }
             	        });
             	Bundle parameters = new Bundle();
-            	parameters.putString("fields", "id,name,link");
+            	parameters.putString("fields", "first_name,last_name,link");
             	request.setParameters(parameters);
             	request.executeAsync();
             }

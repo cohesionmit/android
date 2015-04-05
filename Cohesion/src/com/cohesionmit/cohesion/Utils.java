@@ -4,6 +4,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -19,6 +23,8 @@ import org.json.JSONObject;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.os.AsyncTask;
 
@@ -29,9 +35,29 @@ public class Utils {
 		public void onError(int errorCode);
 	}
 	
+	public static final String APP_URL = "http://cohesionmit.herokuapp.com";
+	public static final String CLASS_TODO = "TODO";
+	public static final String CLASS_STARTED = "STARTED";
+	public static final String CLASS_DONE = "DONE";
 	public static final int CLIENT_SIDE_ERROR = 789;
 	
+	private static final String CLASSES_KEY = "classes";
+	
 	private static HttpClient sHttpClient;
+	
+	public static Map<String, String> getLocalClasses(SharedPreferences prefs) {
+		Set<String> classSet = prefs.getStringSet(CLASSES_KEY, null);
+		
+		return classSetToMap(classSet);
+	}
+	
+	public static void updateLocalClasses(SharedPreferences prefs, Map<String, String> classes) {
+		Set<String> classSet = classMapToSet(classes);
+		
+		Editor editor = prefs.edit();
+		editor.putStringSet(CLASSES_KEY, classSet);
+		editor.commit();
+	}
 	
 	public static void openURL(Context ctx, String url) {
 		Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
@@ -54,6 +80,27 @@ public class Utils {
 		checkClient();
 		HttpPut request = new HttpPut(url);
 		sendRequest(request, handler);
+	}
+	
+	private static Map<String, String> classSetToMap(Set<String> set) {
+		HashMap<String, String> classMap = new HashMap<String, String>();
+		
+		for (String s : set) {
+			String[] keyVal = s.split("=");
+			classMap.put(keyVal[0], keyVal[1]);
+		}
+		
+		return classMap;
+	}
+	
+	private static Set<String> classMapToSet(Map<String, String> map) {
+		HashSet<String> classSet = new HashSet<String>();
+		
+		for (Map.Entry<String, String> e : map.entrySet()) {
+			classSet.add(e.getKey() + "=" + e.getValue());
+		}
+		
+		return classSet;
 	}
 	
 	private static void sendRequest(HttpUriRequest request, ResponseHandler handler) {
