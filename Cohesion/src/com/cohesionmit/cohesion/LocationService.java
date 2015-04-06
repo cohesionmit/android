@@ -1,5 +1,8 @@
 package com.cohesionmit.cohesion;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -13,11 +16,14 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.location.Location;
+import android.os.Binder;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
-import android.preference.PreferenceManager;
+import android.os.Message;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 
@@ -29,13 +35,19 @@ GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener 
 	
 	private final static int UPDATE_FREQ = 1000 * 30;
 	private final static int FASTEST_UPDATE_FREQ = 1000 * 5;
+	private final static int MIN_DISPLACEMENT = 10;
 	private final static int NOTIFICATION_ID = 9001;
-
+	private final static int KEEPALIVE_INTERVAL = 1000 * 60 * 15;
+	
+	private WakeLock mWakeLock;
 	private Notification mNotification;
 	private NotificationManager mNotificationManager;
 	private GoogleApiClient mGoogleApiClient;
 	private LocationRequest mLocationRequest;
     private boolean mInProgress = false;
+    
+    private final IBinder mBinder = new LocalBinder();
+    private final Timer mTimer = new Timer();
     
     @Override
 	public void onCreate() {
@@ -44,6 +56,9 @@ GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener 
         if (!checkServices()) {
         	return;
         }
+        
+        PowerManager mgr = (PowerManager) getSystemService(Context.POWER_SERVICE);
+    	mWakeLock = mgr.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "wakeLock");
         
         NotificationCompat.Builder notificationBuilder =
     	        new NotificationCompat.Builder(this)
@@ -77,7 +92,7 @@ GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener 
 				.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
 				.setInterval(UPDATE_FREQ)
 				.setFastestInterval(FASTEST_UPDATE_FREQ)
-				.setSmallestDisplacement(0);
+				.setSmallestDisplacement(MIN_DISPLACEMENT);
     }
     
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -107,6 +122,11 @@ GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener 
 				mGoogleApiClient, mLocationRequest, this);
     	
     	showNotification();
+    	
+    	if (mWakeLock != null) {
+    		mWakeLock.acquire();
+    	}
+    	mTimer.scheduleAtFixedRate(mKeepaliveTask, 0, KEEPALIVE_INTERVAL);
     }
 
     @Override
@@ -118,6 +138,10 @@ GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener 
     public void onConnectionFailed(ConnectionResult connectionResult) {
     	mInProgress = false;
     	hideNotification();
+    	
+    	if (mWakeLock != null) {
+    		mWakeLock.release();
+    	}
     }
     
     @Override
@@ -125,7 +149,11 @@ GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener 
         mInProgress = false;
         hideNotification();
         
-        if(mGoogleApiClient != null) {
+        if (mWakeLock != null) {
+    		mWakeLock.release();
+    	}
+        
+        if (mGoogleApiClient != null) {
         	LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
         	mGoogleApiClient.disconnect();
 	        mGoogleApiClient = null;
@@ -136,7 +164,7 @@ GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener 
     
     @Override
     public IBinder onBind(Intent intent) {
-    	return null;
+    	return mBinder;
     }
     
     @Override
@@ -180,4 +208,23 @@ GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener 
     		mNotificationManager.cancel(NOTIFICATION_ID);
     	}
     }
+    
+    public class LocalBinder extends Binder {
+        LocationService getService() {
+            return LocationService.this;
+        }
+    }
+    
+    private final TimerTask mKeepaliveTask = new TimerTask() {
+    	public void run() {
+    		mKeepaliveHandler.sendEmptyMessage(0);
+    	}
+    };
+    
+    private final Handler mKeepaliveHandler = new Handler() {
+    	@Override
+    	public void handleMessage(Message msg) {
+    		refreshLocation();
+    	}
+    };
 }
