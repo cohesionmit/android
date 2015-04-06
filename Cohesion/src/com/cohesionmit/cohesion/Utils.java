@@ -22,10 +22,13 @@ import org.apache.http.protocol.HTTP;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.location.Location;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
+import android.util.Log;
 
 public class Utils {
 	
@@ -34,23 +37,28 @@ public class Utils {
 		public void onError(int errorCode);
 	}
 	
-	public static final String APP_URL = "http://cohesionmit.herokuapp.com";
+	public static final String APP_URL = "http://18.189.110.239:8000";
 	public static final String CLASS_TODO = "TODO";
 	public static final String CLASS_STARTED = "STARTED";
 	public static final String CLASS_DONE = "DONE";
+	public static final String URL_KEY = "url";
 	public static final int CLIENT_SIDE_ERROR = 789;
 	
 	private static final String CLASSES_KEY = "classes";
 	
 	private static HttpClient sHttpClient;
 	
-	public static Map<String, String> getLocalClasses(SharedPreferences prefs) {
+	public static Map<String, String> getLocalClasses(Context context) {
+		SharedPreferences prefs =
+        		PreferenceManager.getDefaultSharedPreferences(context);
 		Set<String> classSet = prefs.getStringSet(CLASSES_KEY, null);
 		
 		return classSetToMap(classSet);
 	}
 	
-	public static void updateLocalClasses(SharedPreferences prefs, Map<String, String> classes) {
+	public static void updateLocalClasses(Context context, Map<String, String> classes) {
+		SharedPreferences prefs =
+        		PreferenceManager.getDefaultSharedPreferences(context);
 		Set<String> classSet = classMapToSet(classes);
 		
 		Editor editor = prefs.edit();
@@ -58,7 +66,8 @@ public class Utils {
 		editor.commit();
 	}
 	
-	public void register(String firstName, String lastName, String link, ResponseHandler handler) {
+	public static void register(
+			String firstName, String lastName, String link, ResponseHandler handler) {
 		HttpPost request = new HttpPost(APP_URL + "/api/register");
 		
 		JSONObject json = new JSONObject();
@@ -74,7 +83,7 @@ public class Utils {
 		sendPost(request, json, handler);
 	}
 	
-	public void near(String link, int limit, ResponseHandler handler) {
+	public static void near(String link, int limit, ResponseHandler handler) {
 		HttpPost request = new HttpPost(APP_URL + "/api/near");
 		
 		JSONObject json = new JSONObject();
@@ -89,7 +98,7 @@ public class Utils {
 		sendPost(request, json, handler);
 	}
 	
-	public void location(String link, Location loc, ResponseHandler handler) {
+	public static void location(String link, Location loc, ResponseHandler handler) {
 		HttpPost request = new HttpPost(APP_URL + "/api/location");
 		
 		JSONObject json = new JSONObject();
@@ -105,7 +114,7 @@ public class Utils {
 		sendPost(request, json, handler);
 	}
 	
-	public void setClasses(String link, Map<String, String> classes, ResponseHandler handler) {
+	public static void setClasses(String link, Map<String, String> classes, ResponseHandler handler) {
 		HttpPost request = new HttpPost(APP_URL + "/api/setclasses");
 		
 		JSONObject classJSON = new JSONObject();
@@ -125,7 +134,7 @@ public class Utils {
 		sendPost(request, json, handler);
 	}
 	
-	public void getClasses(String link, ResponseHandler handler) {
+	public static void getClasses(String link, ResponseHandler handler) {
 		HttpPost request = new HttpPost(APP_URL + "/api/getclasses");
 		
 		JSONObject json = new JSONObject();
@@ -221,6 +230,11 @@ public class Utils {
 	    @Override
 	    protected void onPostExecute(String result) {
 	        super.onPostExecute(result);
+	        Log.d("Cohesion", Integer.toString(mStatus));
+	        if (mHandler == null) {
+	        	return;
+	        }
+	        
 	        if (result != null) {
 	        	JSONObject jsonObject;
 				try {

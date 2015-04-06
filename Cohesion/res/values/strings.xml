@@ -7,6 +7,6 @@
     <string name="facebook_app_id">386553418194450</string>
     <string name="no_login">Not logged in</string>
     <string name="notification_title">Cohesion is Online</string>
-    <string name="notification_text">Tap to go offline.</string>
+    <string name="notification_text">Tap to go offline</string>
 
 </resources>

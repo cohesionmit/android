@@ -1,5 +1,6 @@
 package com.cohesionmit.cohesion;
 
+import java.lang.ref.WeakReference;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -16,6 +17,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Binder;
 import android.os.Bundle;
@@ -24,6 +26,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 
@@ -40,6 +43,7 @@ GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener 
 	private final static int KEEPALIVE_INTERVAL = 1000 * 60 * 15;
 	
 	private WakeLock mWakeLock;
+	private Handler mKeepaliveHandler;
 	private Notification mNotification;
 	private NotificationManager mNotificationManager;
 	private GoogleApiClient mGoogleApiClient;
@@ -59,6 +63,8 @@ GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener 
         
         PowerManager mgr = (PowerManager) getSystemService(Context.POWER_SERVICE);
     	mWakeLock = mgr.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "wakeLock");
+    	
+    	mKeepaliveHandler = new KeepaliveHandler(this);
         
         NotificationCompat.Builder notificationBuilder =
     	        new NotificationCompat.Builder(this)
@@ -145,7 +151,7 @@ GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener 
     }
     
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
         mInProgress = false;
         hideNotification();
         
@@ -181,7 +187,12 @@ GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener 
     
     private void sendLocation(Location location) {
     	if (location != null) {
-			// TODO
+    		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+			String link = prefs.getString(Utils.URL_KEY, null);
+			
+			if (link != null) {
+				Utils.location(link, location, null);
+			}
 		}
     }
     
@@ -215,16 +226,27 @@ GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener 
         }
     }
     
-    private final TimerTask mKeepaliveTask = new TimerTask() {
-    	public void run() {
-    		mKeepaliveHandler.sendEmptyMessage(0);
+    private static class KeepaliveHandler extends Handler {
+    	private final WeakReference<LocationService> mService;
+    	
+    	public KeepaliveHandler(LocationService service) {
+    		mService = new WeakReference<LocationService>(service);
     	}
-    };
-    
-    private final Handler mKeepaliveHandler = new Handler() {
+    	
     	@Override
     	public void handleMessage(Message msg) {
-    		refreshLocation();
+    		LocationService service = mService.get();
+    		if (service != null) {
+    			service.refreshLocation();
+    		}
+    	}
+    }
+    
+    private final TimerTask mKeepaliveTask = new TimerTask() {
+    	public void run() {
+    		if (mKeepaliveHandler != null) {
+    			mKeepaliveHandler.sendEmptyMessage(0);
+    		}
     	}
     };
 }

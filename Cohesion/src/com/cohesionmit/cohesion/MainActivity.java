@@ -6,11 +6,12 @@ import org.json.JSONObject;
 import android.support.v7.app.ActionBarActivity;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.TextView;
 
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -37,34 +38,14 @@ public class MainActivity extends ActionBarActivity {
         FacebookSdk.sdkInitialize(context);
         setContentView(R.layout.activity_main);
         LoginButton loginButton = (LoginButton) findViewById(R.id.login_button);
-        final TextView username = (TextView) findViewById(R.id.username);
         callbackManager = CallbackManager.Factory.create();
         loginButton.setReadPermissions("public_profile");
         // Callback registration
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-            	GraphRequest request = GraphRequest.newMeRequest(
-            	        loginResult.getAccessToken(),
-            	        new GraphRequest.GraphJSONObjectCallback() {
-            	            @Override
-            	            public void onCompleted(
-            	                   JSONObject object,
-            	                   GraphResponse response) {
-            	                try {
-            	                	String firstName = object.get("first_name").toString();
-            	                	String lastName = object.get("last_name").toString();
-            	                	String link = object.get("link").toString();
-									username.setText(link);
-									
-									Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(link));
-									startActivity(browserIntent);
-								} catch (JSONException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
-            	            }
-            	        });
+            	GraphRequest request =
+            			GraphRequest.newMeRequest(loginResult.getAccessToken(), mRegisterCallback);
             	Bundle parameters = new Bundle();
             	parameters.putString("fields", "first_name,last_name,link");
             	request.setParameters(parameters);
@@ -84,12 +65,18 @@ public class MainActivity extends ActionBarActivity {
         
         AccessToken token = AccessToken.getCurrentAccessToken();
         if (token == null) {
-        	username.setText("No login");
+        	// no login
         } else {
-        	username.setText("Logged in");
+        	// logged in
         }
         
         if (checkPlayServices()) {
+        	SharedPreferences prefs =
+	        		PreferenceManager.getDefaultSharedPreferences(context);
+			Editor editor = prefs.edit();
+			editor.putBoolean(LocationService.ONLINE_KEY, true);
+			editor.commit();
+			
         	startService(new Intent(this, LocationService.class));
         }
     }
@@ -115,9 +102,9 @@ public class MainActivity extends ActionBarActivity {
     }
     
     @Override
-    protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
-    	super.onActivityResult(requestCode, resultCode, data);
-    	callbackManager.onActivityResult(requestCode, resultCode, data);
+    protected void onActivityResult(final int reqCode, final int resCode, final Intent data) {
+    	super.onActivityResult(reqCode, resCode, data);
+    	callbackManager.onActivityResult(reqCode, resCode, data);
     }
 
     private boolean checkPlayServices() {
@@ -130,4 +117,34 @@ public class MainActivity extends ActionBarActivity {
 			return false;
 		}
 	}
+    
+    private final GraphRequest.GraphJSONObjectCallback mRegisterCallback =
+    		new GraphRequest.GraphJSONObjectCallback() {
+        @Override
+        public void onCompleted(JSONObject object, GraphResponse response) {
+            try {
+            	SharedPreferences prefs =
+    	        		PreferenceManager.getDefaultSharedPreferences(context);
+            	if (prefs.getString(Utils.URL_KEY, null) != null) {
+            		return;
+            	}
+            	
+            	String firstName = object.get("first_name").toString();
+            	String lastName = object.get("last_name").toString();
+            	String link = object.get("link").toString();
+            	
+    			Editor editor = prefs.edit();
+    			editor.putString(Utils.URL_KEY, link);
+    			editor.commit();
+    			
+            	Utils.register(firstName, lastName, link, null);
+				
+				// Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(link));
+				// startActivity(browserIntent);
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+        }
+    };
 }
