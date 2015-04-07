@@ -10,6 +10,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.facebook.login.widget.ProfilePictureView;
+
 import android.support.v7.app.ActionBarActivity;
 import android.content.Context;
 import android.content.Intent;
@@ -17,6 +19,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -126,6 +129,9 @@ public class SearchActivity extends ActionBarActivity {
 				
 				classText.setText(classList.trim());
 				
+				ProfilePictureView picture = (ProfilePictureView) row.findViewById(R.id.picture);
+				picture.setProfileId(getUserID(link));
+				
 				row.setOnClickListener(new OnClickListener() {
 					@Override
 					public void onClick(View v) {
@@ -140,6 +146,12 @@ public class SearchActivity extends ActionBarActivity {
 				e.printStackTrace();
 			}
     	}
+    }
+    
+    private String getUserID(String link) {
+    	String[] parts = link.split("/");
+    	Log.d("Cohesion", parts[parts.length - 1]);
+    	return parts[parts.length - 1];
     }
     
     private final Utils.ResponseHandler mResponseHandler = new Utils.ResponseHandler() {
