@@ -40,15 +40,7 @@ public class MainActivity extends ActionBarActivity {
         SharedPreferences prefs =
         		PreferenceManager.getDefaultSharedPreferences(context);
     	if (prefs.getString(Utils.URL_KEY, null) != null) {
-    		if (checkPlayServices()) {
-    			Editor editor = prefs.edit();
-    			editor.putBoolean(LocationService.ONLINE_KEY, true);
-    			editor.commit();
-    			
-            	startService(new Intent(this, LocationService.class));
-            }
-        	
-        	goToHome();
+    		goToHome();
     	}
         
         setContentView(R.layout.activity_main);
@@ -117,6 +109,16 @@ public class MainActivity extends ActionBarActivity {
 	}
     
     private void goToHome() {
+    	if (checkPlayServices()) {
+    		SharedPreferences prefs =
+            		PreferenceManager.getDefaultSharedPreferences(context);
+			Editor editor = prefs.edit();
+			editor.putBoolean(LocationService.ONLINE_KEY, true);
+			editor.commit();
+			
+        	startService(new Intent(this, LocationService.class));
+        }
+    	
     	Intent intent = new Intent(this, HomeActivity.class);
         startActivity(intent);
         
