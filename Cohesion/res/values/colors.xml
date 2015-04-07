@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="table_border" type="color">#999999</item>
+    <item name="table_select" type="color">#BFBFBF</item>
+</resources>

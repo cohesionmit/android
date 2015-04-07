@@ -19,6 +19,7 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.HTTP;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -52,6 +53,10 @@ public class Utils {
 		SharedPreferences prefs =
         		PreferenceManager.getDefaultSharedPreferences(context);
 		Set<String> classSet = prefs.getStringSet(CLASSES_KEY, null);
+		
+		if (classSet == null) {
+			classSet = new HashSet<String>();
+		}
 		
 		return classSetToMap(classSet);
 	}
@@ -117,15 +122,19 @@ public class Utils {
 	public static void setClasses(String link, Map<String, String> classes, ResponseHandler handler) {
 		HttpPost request = new HttpPost(APP_URL + "/api/setclasses");
 		
-		JSONObject classJSON = new JSONObject();
+		JSONArray classList = new JSONArray();
+		JSONObject classJSON;
 		JSONObject json = new JSONObject();
 		try {
 			for (Map.Entry<String, String> e : classes.entrySet()) {
-				classJSON.put(e.getKey(), e.getValue());
+				classJSON = new JSONObject();
+				classJSON.put("name", e.getKey());
+				classJSON.put("status", e.getValue());
+				classList.put(classJSON);
 			}
 			
 			json.put("fburl", link);
-			json.put("classes", classJSON);
+			json.put("classes", classList);
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -171,6 +180,7 @@ public class Utils {
 	
 	private static void sendPost(HttpPost request, JSONObject json, ResponseHandler handler) {
 		checkClient();
+		Log.d("Cohesion", json.toString());
 		
 		try {
 			StringEntity entity = new StringEntity(json.toString(), HTTP.UTF_8);

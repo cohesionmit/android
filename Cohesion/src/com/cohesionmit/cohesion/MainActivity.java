@@ -13,7 +13,6 @@ import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
@@ -34,8 +33,24 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
         context = getApplicationContext();
         FacebookSdk.sdkInitialize(context);
+        
+        SharedPreferences prefs =
+        		PreferenceManager.getDefaultSharedPreferences(context);
+    	if (prefs.getString(Utils.URL_KEY, null) != null) {
+    		if (checkPlayServices()) {
+    			Editor editor = prefs.edit();
+    			editor.putBoolean(LocationService.ONLINE_KEY, true);
+    			editor.commit();
+    			
+            	startService(new Intent(this, LocationService.class));
+            }
+        	
+        	goToHome();
+    	}
+        
         setContentView(R.layout.activity_main);
         LoginButton loginButton = (LoginButton) findViewById(R.id.login_button);
         callbackManager = CallbackManager.Factory.create();
@@ -62,23 +77,6 @@ public class MainActivity extends ActionBarActivity {
                 // App code
             }
         });
-        
-        AccessToken token = AccessToken.getCurrentAccessToken();
-        if (token == null) {
-        	// no login
-        } else {
-        	// logged in
-        }
-        
-        if (checkPlayServices()) {
-        	SharedPreferences prefs =
-	        		PreferenceManager.getDefaultSharedPreferences(context);
-			Editor editor = prefs.edit();
-			editor.putBoolean(LocationService.ONLINE_KEY, true);
-			editor.commit();
-			
-        	startService(new Intent(this, LocationService.class));
-        }
     }
 
 
@@ -118,6 +116,13 @@ public class MainActivity extends ActionBarActivity {
 		}
 	}
     
+    private void goToHome() {
+    	Intent intent = new Intent(this, HomeActivity.class);
+        startActivity(intent);
+        
+        finish();
+    }
+    
     private final GraphRequest.GraphJSONObjectCallback mRegisterCallback =
     		new GraphRequest.GraphJSONObjectCallback() {
         @Override
@@ -138,9 +143,8 @@ public class MainActivity extends ActionBarActivity {
     			editor.commit();
     			
             	Utils.register(firstName, lastName, link, null);
-				
-				// Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(link));
-				// startActivity(browserIntent);
+            	
+            	goToHome();
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
