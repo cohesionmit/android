@@ -38,7 +38,7 @@ public class Utils {
 		public void onError(int errorCode);
 	}
 	
-	public static final String APP_URL = "http://18.189.110.239:8000";
+	public static final String APP_URL = "http://cohesionmit.herokuapp.com";
 	public static final String CLASS_TODO = "TODO";
 	public static final String CLASS_STARTED = "STARTED";
 	public static final String CLASS_DONE = "DONE";
