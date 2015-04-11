@@ -158,7 +158,19 @@ public class Utils {
 	}
 	
 	private static Map<String, String> classSetToMap(Set<String> set) {
-		HashMap<String, String> classMap = new HashMap<String, String>();
+		TreeMap<String, String> classMap = new HashMap<String, String>((new Comparator<String>(){					@Override
+			int compare(String s, String t){
+				int i = Integer.parseInt(s.substring(0,s.indexOf('.'),36)
+					-Integer.parseInt(t.substring(0,t.indexOf('.'),36));
+				if(i!=0) return i;
+				return Integer.parseInt(s.substring(1+s.indexOf('.'),36)
+					-Integer.parseInt(t.substring(1+t.indexOf('.'),36));
+			}
+			@Override
+			boolean equals(String s, String t){
+				return compare(s,t)==0;
+			}
+		});
 		
 		for (String s : set) {
 			String[] keyVal = s.split("=");
