@@ -1,9 +1,10 @@
 package com.cohesionmit.cohesion;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -28,6 +29,7 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+@SuppressLint("InflateParams")
 public class HomeActivity extends Activity {
 	
 	private Context context;
@@ -59,8 +61,8 @@ public class HomeActivity extends Activity {
         	className.setText(e.getKey());
             table.addView(row);
             
-            LinearLayout classSelector = (LinearLayout) className.getParent();
-            classSelector.setOnTouchListener(new ClassListener(classSelector));
+            LinearLayout classSelector = (LinearLayout) row.findViewById(R.id.delete_class);
+            classSelector.setOnClickListener(new ClassListener(classSelector));
             
             LinearLayout todo = (LinearLayout) row.findViewById(R.id.todo);
             todo.setTag(Utils.CLASS_TODO);
@@ -94,7 +96,7 @@ public class HomeActivity extends Activity {
     public void addClass(View v) {
     	final EditText entry = (EditText) findViewById(R.id.add_class);
     	
-    	String newClass = entry.getText().toString().trim().toUpperCase();
+    	String newClass = entry.getText().toString().trim().toUpperCase(Locale.US);
     	
     	if (newClass.length() == 0) {
     		new AlertDialog.Builder(context)
@@ -156,8 +158,8 @@ public class HomeActivity extends Activity {
     	className.setText(newClass);
         table.addView(row);
         
-        LinearLayout classSelector = (LinearLayout) className.getParent();
-        classSelector.setOnTouchListener(new ClassListener(classSelector));
+        LinearLayout classSelector = (LinearLayout) row.findViewById(R.id.delete_class);
+        classSelector.setOnClickListener(new ClassListener(classSelector));
         
         LinearLayout todo = (LinearLayout) row.findViewById(R.id.todo);
         todo.setTag(Utils.CLASS_TODO);
@@ -228,58 +230,46 @@ public class HomeActivity extends Activity {
     	}
     };
     
-    private class ClassListener implements OnTouchListener {
+    private class ClassListener implements View.OnClickListener {
     	private final View mView;
-    	private final GestureDetector mGestureDetector;
     	
     	public ClassListener(View v) {
     		mView = v;
-    		
-    		mGestureDetector = new GestureDetector(context,
-    				new GestureDetector.SimpleOnGestureListener() {
-        		@Override
-        		public boolean onDoubleTap(MotionEvent e) {
-        			final TableRow row = (TableRow) mView.getParent();
-        			final ViewGroup table = (ViewGroup) row.getParent();
-        			final String className =
-        					((TextView) mView.findViewById(R.id.class_name)).getText().toString();
-        			
-        			new AlertDialog.Builder(context)
-            		.setTitle(resources.getString(R.string.delete_class_confirm_title))
-            		.setMessage(resources.getString(R.string.delete_class_confirm_message, className))
-            		.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-            			public void onClick(DialogInterface dialog, int which) { 
-            				mClasses.remove(className);
-                			Utils.updateLocalClasses(context, mClasses);
-                			SharedPreferences prefs =
-                	        		PreferenceManager.getDefaultSharedPreferences(context);
-                        	Utils.setClasses(prefs.getString(Utils.URL_KEY, null), mClasses, null);
-                			
-                			if (mClasses.size() == 0) {
-                				table.removeAllViews();
-                			} else {
-                				View divider = table.getChildAt(table.indexOfChild(row) + 1);
-                    			table.removeView(row);
-                    			table.removeView(divider);
-                			}
-            			}
-            		})
-            		.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-            			public void onClick(DialogInterface dialog, int which) { 
-            				// do nothing
-            			}
-            		})
-            		.show();
-        			
-        			return super.onDoubleTap(e);
-        		}
-        	});
     	}
 
     	@Override
-    	public boolean onTouch(View v, MotionEvent event) {
-    		mGestureDetector.onTouchEvent(event);
-    		return true;
-    	}
+		public void onClick(View v) {
+    		final TableRow row = (TableRow) mView.getParent();
+			final ViewGroup table = (ViewGroup) row.getParent();
+			final String className =
+					((TextView) row.findViewById(R.id.class_name)).getText().toString();
+			
+			new AlertDialog.Builder(context)
+    		.setTitle(resources.getString(R.string.delete_class_confirm_title))
+    		.setMessage(resources.getString(R.string.delete_class_confirm_message, className))
+    		.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+    			public void onClick(DialogInterface dialog, int which) { 
+    				mClasses.remove(className);
+        			Utils.updateLocalClasses(context, mClasses);
+        			SharedPreferences prefs =
+        	        		PreferenceManager.getDefaultSharedPreferences(context);
+                	Utils.setClasses(prefs.getString(Utils.URL_KEY, null), mClasses, null);
+        			
+        			if (mClasses.size() == 0) {
+        				table.removeAllViews();
+        			} else {
+        				View divider = table.getChildAt(table.indexOfChild(row) + 1);
+            			table.removeView(row);
+            			table.removeView(divider);
+        			}
+    			}
+    		})
+    		.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+    			public void onClick(DialogInterface dialog, int which) { 
+    				// do nothing
+    			}
+    		})
+    		.show();
+		}
     };
 }
