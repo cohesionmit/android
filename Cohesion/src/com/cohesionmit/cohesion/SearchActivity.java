@@ -21,7 +21,6 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -132,7 +131,6 @@ public class SearchActivity extends Activity {
     
     private String getUserID(String link) {
         String[] parts = link.split("/");
-        Log.d("Cohesion", parts[parts.length - 1]);
         return parts[parts.length - 1];
     }
     

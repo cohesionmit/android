@@ -29,7 +29,6 @@ import android.content.SharedPreferences.Editor;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 public class Utils {
     
@@ -189,7 +188,6 @@ public class Utils {
     
     private static void sendPost(HttpPost request, JSONObject json, ResponseHandler handler) {
         checkClient();
-        Log.d("Cohesion", json.toString());
         
         try {
             StringEntity entity = new StringEntity(json.toString(), HTTP.UTF_8);
@@ -249,7 +247,7 @@ public class Utils {
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-            Log.d("Cohesion", Integer.toString(mStatus));
+            
             if (mHandler == null) {
                 return;
             }
