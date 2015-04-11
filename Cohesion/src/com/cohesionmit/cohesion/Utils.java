@@ -168,8 +168,8 @@ public class Utils {
 					-Integer.parseInt(t.substring(1+t.indexOf('.')),36);
 			}
 			@Override
-			boolean equals(String s, String t){
-				return compare(s,t)==0;
+			boolean equals(Object o){
+				return false;
 			}
 		});
 		
