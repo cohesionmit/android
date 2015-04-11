@@ -92,14 +92,29 @@ public class HomeActivity extends Activity {
     }
     
     public void addClass(View v) {
-    	EditText entry = (EditText) findViewById(R.id.add_class);
+    	final EditText entry = (EditText) findViewById(R.id.add_class);
     	
     	String newClass = entry.getText().toString().trim();
     	
     	if (newClass == null || newClass.length() == 0) {
     		new AlertDialog.Builder(context)
-			.setTitle(resources.getString(R.string.add_class_error_title))
-			.setMessage(resources.getString(R.string.add_class_error_no_name))
+			.setTitle(resources.getString(R.string.add_class_no_name_title))
+			.setMessage(resources.getString(R.string.add_class_no_name_message))
+			.setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+    			@Override
+    			public void onClick(DialogInterface dialog, int which) { 
+    				entry.setText("");
+    			}
+    		})
+    		.show();
+    		
+    		return;
+    	}
+    	
+    	if (!Utils.checkClassName(newClass)) {
+    		new AlertDialog.Builder(context)
+			.setTitle(resources.getString(R.string.add_class_invalid_title))
+			.setMessage(resources.getString(R.string.add_class_invalid_message, newClass))
 			.setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
     			@Override
     			public void onClick(DialogInterface dialog, int which) { 
@@ -111,14 +126,14 @@ public class HomeActivity extends Activity {
     		return;
     	}
     	
-    	if (!Utils.checkClassName(newClass)) {
+    	if (mClasses.keySet().contains(newClass)) {
     		new AlertDialog.Builder(context)
-			.setTitle(resources.getString(R.string.add_class_error_title))
-			.setMessage(resources.getString(R.string.add_class_error_message, newClass))
+			.setTitle(resources.getString(R.string.add_class_duplicate_title))
+			.setMessage(resources.getString(R.string.add_class_duplicate_message, newClass))
 			.setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
     			@Override
     			public void onClick(DialogInterface dialog, int which) { 
-    				// do nothing
+    				entry.setText("");
     			}
     		})
     		.show();

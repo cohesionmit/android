@@ -14,9 +14,12 @@
     
     <string name="add_class_hint">(enter class number)</string>
     <string name="add_class_button">Add Class</string>
-    <string name="add_class_error_title">Invalid Class Number</string>
-    <string name="add_class_error_message">%1$s is not a valid class number.</string>
-    <string name="add_class_error_no_name">You must enter a class number.</string>
+    <string name="add_class_invalid_title">Invalid Class Number</string>
+    <string name="add_class_invalid_message">%1$s is not a valid class number.</string>
+    <string name="add_class_no_name_title">No Class Number</string>
+    <string name="add_class_no_name_message">You must enter a class number.</string>
+    <string name="add_class_duplicate_title">Duplicate Class</string>
+    <string name="add_class_duplicate_message">You already have a class named %1$s.</string>
     
     <string name="delete_class_confirm_title">Delete Class?</string>
     <string name="delete_class_confirm_message">Are you sure you want to delete %1$s?</string>
