@@ -159,7 +159,7 @@ public class Utils {
 	}
 	
 	private static Map<String, String> classSetToMap(Set<String> set) {
-		TreeMap<String, String> classMap = new HashMap<String, String>(new Comparator<String>(){					@Override
+		TreeMap<String, String> classMap = new TreeMap<String, String>(new Comparator<String>(){					@Override
 			int compare(String s, String t){
 				int i = Integer.parseInt(s.substring(0,s.indexOf('.')),36)
 					-Integer.parseInt(t.substring(0,t.indexOf('.')),36);
