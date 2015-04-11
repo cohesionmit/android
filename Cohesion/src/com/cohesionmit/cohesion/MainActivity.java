@@ -97,7 +97,7 @@ public class MainActivity extends Activity {
 			editor.putBoolean(LocationService.ONLINE_KEY, true);
 			editor.commit();
 			
-        	// startService(new Intent(this, LocationService.class));
+        	startService(new Intent(this, LocationService.class));
         }
     	
     	Intent intent = new Intent(this, HomeActivity.class);
