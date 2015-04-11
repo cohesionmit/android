@@ -3,6 +3,7 @@ package com.cohesionmit.cohesion;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Comparator;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -100,11 +101,11 @@ public class SearchActivity extends ActionBarActivity {
 				
 				SortedMap<String, String> classes = new TreeMap<String, String>(new Comparator<String>(){					@Override
 					int compare(String s, String t){
-						int i = Integer.parseInt(s.substring(0,s.indexOf('.'),36)
-							-Integer.parseInt(t.substring(0,t.indexOf('.'),36));
+						int i = Integer.parseInt(s.substring(0,s.indexOf('.')),36)
+							-Integer.parseInt(t.substring(0,t.indexOf('.')),36);
 						if(i!=0) return i;
-						return Integer.parseInt(s.substring(1+s.indexOf('.'),36)
-							-Integer.parseInt(t.substring(1+t.indexOf('.'),36));
+						return Integer.parseInt(s.substring(1+s.indexOf('.')),36)
+							-Integer.parseInt(t.substring(1+t.indexOf('.')),36);
 					}
 					@Override
 					boolean equals(String s, String t){
