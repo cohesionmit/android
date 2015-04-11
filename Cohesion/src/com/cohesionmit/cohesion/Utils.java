@@ -47,9 +47,18 @@ public class Utils {
 	public static final String URL_KEY = "url";
 	public static final int CLIENT_SIDE_ERROR = 789;
 	
+	private static final String CLASS_NAME_REGEX = "^([a-zA-Z0-9])+\\.([a-zA-Z0-9])+$";
 	private static final String CLASSES_KEY = "classes";
 	
 	private static HttpClient sHttpClient;
+	
+	public static boolean checkClassName(String name) {
+		if (name == null || name.length() == 0) {
+			return false;
+		}
+		
+		return name.matches(CLASS_NAME_REGEX);
+	}
 	
 	public static Map<String, String> getLocalClasses(Context context) {
 		SharedPreferences prefs =
@@ -160,19 +169,7 @@ public class Utils {
 	}
 	
 	private static Map<String, String> classSetToMap(Set<String> set) {
-		TreeMap<String, String> classMap = new TreeMap<String, String>(new Comparator<String>(){					@Override
-			public int compare(String s, String t){
-				int i = Integer.parseInt(s.substring(0,s.indexOf('.')),36)
-					-Integer.parseInt(t.substring(0,t.indexOf('.')),36);
-				if(i!=0) return i;
-				return Integer.parseInt(s.substring(1+s.indexOf('.')),36)
-					-Integer.parseInt(t.substring(1+t.indexOf('.')),36);
-			}
-			@Override
-			public boolean equals(Object o){
-				return false;
-			}
-		});
+		TreeMap<String, String> classMap = new TreeMap<String, String>(new ClassNameComparator());
 		
 		for (String s : set) {
 			String[] keyVal = s.split("=");

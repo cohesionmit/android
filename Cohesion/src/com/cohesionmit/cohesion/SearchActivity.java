@@ -81,19 +81,8 @@ public class SearchActivity extends Activity {
 				String distance = String.format("%.2f", o.getDouble("distance"));
 				JSONArray classesJSON = o.getJSONArray("classes");
 				
-				SortedMap<String, String> classes = new TreeMap<String, String>(new Comparator<String>(){					@Override
-					public int compare(String s, String t){
-						int i = Integer.parseInt(s.substring(0,s.indexOf('.')),36)
-							-Integer.parseInt(t.substring(0,t.indexOf('.')),36);
-						if(i!=0) return i;
-						return Integer.parseInt(s.substring(1+s.indexOf('.')),36)
-							-Integer.parseInt(t.substring(1+t.indexOf('.')),36);
-					}
-					@Override
-					public boolean equals(Object o){
-						return false;
-					}
-				});
+				SortedMap<String, String> classes =
+						new TreeMap<String, String>(new ClassNameComparator());
 				for (int i = 0; i < classesJSON.length(); i++) {
 					JSONObject classJSON = classesJSON.getJSONObject(i);
 					classes.put(classJSON.getString("name"), classJSON.getString("status"));

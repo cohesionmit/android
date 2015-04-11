@@ -5,9 +5,12 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
@@ -28,6 +31,7 @@ import android.widget.TextView;
 public class HomeActivity extends Activity {
 	
 	private Context context;
+	private Resources resources;
 	private Map<String, String> mClasses;
 	
 	@Override
@@ -35,6 +39,7 @@ public class HomeActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         context = this;
+        resources = context.getResources();
         mClasses = Utils.getLocalClasses(this);
         
         if (mClasses.size() == 0) {
@@ -78,7 +83,7 @@ public class HomeActivity extends Activity {
             }
             
             if (statusSwitch != null) {
-            	statusSwitch.setBackgroundColor(getResources().getColor(R.color.table_select));
+            	statusSwitch.setBackgroundColor(resources.getColor(R.color.table_select));
             }
         	
         	divider = (TableRow) getLayoutInflater().inflate(R.layout.row_divider, null);
@@ -89,7 +94,38 @@ public class HomeActivity extends Activity {
     public void addClass(View v) {
     	EditText entry = (EditText) findViewById(R.id.add_class);
     	
-    	String newClass = entry.getText().toString();
+    	String newClass = entry.getText().toString().trim();
+    	
+    	if (newClass == null || newClass.length() == 0) {
+    		new AlertDialog.Builder(context)
+			.setTitle(resources.getString(R.string.add_class_error_title))
+			.setMessage(resources.getString(R.string.add_class_error_no_name))
+			.setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+    			@Override
+    			public void onClick(DialogInterface dialog, int which) { 
+    				// do nothing
+    			}
+    		})
+    		.show();
+    		
+    		return;
+    	}
+    	
+    	if (!Utils.checkClassName(newClass)) {
+    		new AlertDialog.Builder(context)
+			.setTitle(resources.getString(R.string.add_class_error_title))
+			.setMessage(resources.getString(R.string.add_class_error_message, newClass))
+			.setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+    			@Override
+    			public void onClick(DialogInterface dialog, int which) { 
+    				// do nothing
+    			}
+    		})
+    		.show();
+    		
+    		return;
+    	}
+    	
     	entry.setText("");
     	
     	TableLayout table = (TableLayout) findViewById(R.id.class_table);
@@ -118,7 +154,7 @@ public class HomeActivity extends Activity {
         done.setTag(Utils.CLASS_DONE);
         done.setOnClickListener(mStatusListener);
         
-        todo.setBackgroundColor(getResources().getColor(R.color.table_select));
+        todo.setBackgroundColor(resources.getColor(R.color.table_select));
     	
         table.addView(divider);
         
@@ -148,7 +184,7 @@ public class HomeActivity extends Activity {
                 LinearLayout done = (LinearLayout) row.findViewById(R.id.done);
     			
     			if (Utils.CLASS_TODO.equals(tag)) {
-                	todo.setBackgroundColor(getResources().getColor(R.color.table_select));
+                	todo.setBackgroundColor(resources.getColor(R.color.table_select));
                 	started.setBackgroundColor(0x00000000);
                 	done.setBackgroundColor(0x00000000);
                 	
@@ -156,7 +192,7 @@ public class HomeActivity extends Activity {
                 	Utils.updateLocalClasses(context, mClasses);
                 } else if (Utils.CLASS_STARTED.equals(tag)) {
                 	todo.setBackgroundColor(0x00000000);
-                	started.setBackgroundColor(getResources().getColor(R.color.table_select));
+                	started.setBackgroundColor(resources.getColor(R.color.table_select));
                 	done.setBackgroundColor(0x00000000);
                 	
                 	mClasses.put(className, Utils.CLASS_STARTED);
@@ -164,7 +200,7 @@ public class HomeActivity extends Activity {
                 } else if (Utils.CLASS_DONE.equals(tag)) {
                 	todo.setBackgroundColor(0x00000000);
                 	started.setBackgroundColor(0x00000000);
-                	done.setBackgroundColor(getResources().getColor(R.color.table_select));
+                	done.setBackgroundColor(resources.getColor(R.color.table_select));
                 	
                 	mClasses.put(className, Utils.CLASS_DONE);
                 	Utils.updateLocalClasses(context, mClasses);
@@ -188,24 +224,37 @@ public class HomeActivity extends Activity {
     				new GestureDetector.SimpleOnGestureListener() {
         		@Override
         		public boolean onDoubleTap(MotionEvent e) {
-        			TableRow row = (TableRow) mView.getParent();
-        			ViewGroup table = (ViewGroup) row.getParent();
-        			String className =
+        			final TableRow row = (TableRow) mView.getParent();
+        			final ViewGroup table = (ViewGroup) row.getParent();
+        			final String className =
         					((TextView) mView.findViewById(R.id.class_name)).getText().toString();
         			
-        			mClasses.remove(className);
-        			Utils.updateLocalClasses(context, mClasses);
-        			SharedPreferences prefs =
-        	        		PreferenceManager.getDefaultSharedPreferences(context);
-                	Utils.setClasses(prefs.getString(Utils.URL_KEY, null), mClasses, null);
-        			
-        			if (mClasses.size() == 0) {
-        				table.removeAllViews();
-        			} else {
-        				View divider = table.getChildAt(table.indexOfChild(row) + 1);
-            			table.removeView(row);
-            			table.removeView(divider);
-        			}
+        			new AlertDialog.Builder(context)
+            		.setTitle(resources.getString(R.string.delete_class_confirm_title))
+            		.setMessage(resources.getString(R.string.delete_class_confirm_message, className))
+            		.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+            			public void onClick(DialogInterface dialog, int which) { 
+            				mClasses.remove(className);
+                			Utils.updateLocalClasses(context, mClasses);
+                			SharedPreferences prefs =
+                	        		PreferenceManager.getDefaultSharedPreferences(context);
+                        	Utils.setClasses(prefs.getString(Utils.URL_KEY, null), mClasses, null);
+                			
+                			if (mClasses.size() == 0) {
+                				table.removeAllViews();
+                			} else {
+                				View divider = table.getChildAt(table.indexOfChild(row) + 1);
+                    			table.removeView(row);
+                    			table.removeView(divider);
+                			}
+            			}
+            		})
+            		.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+            			public void onClick(DialogInterface dialog, int which) { 
+            				// do nothing
+            			}
+            		})
+            		.show();
         			
         			return super.onDoubleTap(e);
         		}

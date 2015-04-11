@@ -14,6 +14,12 @@
     
     <string name="add_class_hint">(enter class number)</string>
     <string name="add_class_button">Add Class</string>
+    <string name="add_class_error_title">Invalid Class Number</string>
+    <string name="add_class_error_message">%1$s is not a valid class number.</string>
+    <string name="add_class_error_no_name">You must enter a class number.</string>
+    
+    <string name="delete_class_confirm_title">Delete Class?</string>
+    <string name="delete_class_confirm_message">Are you sure you want to delete %1$s?</string>
     
     <string name="find_people_button">Find People Working Near You</string>
     
