@@ -2,8 +2,6 @@ package com.cohesionmit.cohesion;
 
 import java.util.Locale;
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -15,16 +13,9 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
-import android.view.GestureDetector;
 import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnKeyListener;
-import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -34,12 +25,12 @@ import android.widget.TextView;
 
 @SuppressLint("InflateParams")
 public class HomeActivity extends Activity {
-	
-	private Context context;
-	private Resources resources;
-	private Map<String, String> mClasses;
-	
-	@Override
+    
+    private Context context;
+    private Resources resources;
+    private Map<String, String> mClasses;
+    
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
@@ -49,19 +40,19 @@ public class HomeActivity extends Activity {
         
         EditText classEntry = (EditText) findViewById(R.id.add_class);
         classEntry.setOnKeyListener(new OnKeyListener() {
-        	public boolean onKey(View v, int keyCode, KeyEvent event) {
-        		if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
-        				(keyCode == KeyEvent.KEYCODE_ENTER)) {
-        			addClass(v);
-        			return true;
-        		}
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
+                        (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                    addClass(v);
+                    return true;
+                }
 
-        		return false;
-        	}
+                return false;
+            }
         });
         
         if (mClasses.size() == 0) {
-        	return;
+            return;
         }
         
         TableLayout table = (TableLayout) findViewById(R.id.class_table);
@@ -72,9 +63,9 @@ public class HomeActivity extends Activity {
         table.addView(divider);
         
         for (Map.Entry<String, String> e : mClasses.entrySet()) {
-        	row = (TableRow) getLayoutInflater().inflate(R.layout.class_row, null);
-        	TextView className = (TextView) row.findViewById(R.id.class_name);
-        	className.setText(e.getKey());
+            row = (TableRow) getLayoutInflater().inflate(R.layout.class_row, null);
+            TextView className = (TextView) row.findViewById(R.id.class_name);
+            className.setText(e.getKey());
             table.addView(row);
             
             LinearLayout classSelector = (LinearLayout) row.findViewById(R.id.delete_class);
@@ -93,85 +84,85 @@ public class HomeActivity extends Activity {
             String status = e.getValue();
             LinearLayout statusSwitch = null;
             if (Utils.CLASS_TODO.equals(status)) {
-            	statusSwitch = todo;
+                statusSwitch = todo;
             } else if (Utils.CLASS_STARTED.equals(status)) {
-            	statusSwitch = started;
+                statusSwitch = started;
             } else if (Utils.CLASS_DONE.equals(status)) {
-            	statusSwitch = done;
+                statusSwitch = done;
             }
             
             if (statusSwitch != null) {
-            	statusSwitch.setBackgroundColor(resources.getColor(R.color.table_select));
+                statusSwitch.setBackgroundColor(resources.getColor(R.color.table_select));
             }
-        	
-        	divider = (TableRow) getLayoutInflater().inflate(R.layout.row_divider, null);
+            
+            divider = (TableRow) getLayoutInflater().inflate(R.layout.row_divider, null);
             table.addView(divider);
         }
     }
     
     public void addClass(View v) {
-    	final EditText entry = (EditText) findViewById(R.id.add_class);
-    	
-    	String newClass = entry.getText().toString().trim().toUpperCase(Locale.US);
-    	
-    	if (newClass.length() == 0) {
-    		new AlertDialog.Builder(context)
-			.setTitle(resources.getString(R.string.add_class_no_name_title))
-			.setMessage(resources.getString(R.string.add_class_no_name_message))
-			.setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-    			@Override
-    			public void onClick(DialogInterface dialog, int which) { 
-    				entry.setText("");
-    			}
-    		})
-    		.show();
-    		
-    		return;
-    	}
-    	
-    	if (!Utils.checkClassName(newClass)) {
-    		new AlertDialog.Builder(context)
-			.setTitle(resources.getString(R.string.add_class_invalid_title))
-			.setMessage(resources.getString(R.string.add_class_invalid_message, newClass))
-			.setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-    			@Override
-    			public void onClick(DialogInterface dialog, int which) { 
-    				// do nothing
-    			}
-    		})
-    		.show();
-    		
-    		return;
-    	}
-    	
-    	if (mClasses.keySet().contains(newClass)) {
-    		new AlertDialog.Builder(context)
-			.setTitle(resources.getString(R.string.add_class_duplicate_title))
-			.setMessage(resources.getString(R.string.add_class_duplicate_message, newClass))
-			.setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-    			@Override
-    			public void onClick(DialogInterface dialog, int which) { 
-    				entry.setText("");
-    			}
-    		})
-    		.show();
-    		
-    		return;
-    	}
-    	
-    	entry.setText("");
-    	
-    	TableLayout table = (TableLayout) findViewById(R.id.class_table);
-    	
-    	TableRow divider = (TableRow) getLayoutInflater().inflate(R.layout.row_divider, null);
-    	if (mClasses.size() == 0) {
-    		table.addView(divider);
-    		divider = (TableRow) getLayoutInflater().inflate(R.layout.row_divider, null);
-    	}
+        final EditText entry = (EditText) findViewById(R.id.add_class);
         
-    	TableRow row = (TableRow) getLayoutInflater().inflate(R.layout.class_row, null);
-    	TextView className = (TextView) row.findViewById(R.id.class_name);
-    	className.setText(newClass);
+        String newClass = entry.getText().toString().trim().toUpperCase(Locale.US);
+        
+        if (newClass.length() == 0) {
+            new AlertDialog.Builder(context)
+            .setTitle(resources.getString(R.string.add_class_no_name_title))
+            .setMessage(resources.getString(R.string.add_class_no_name_message))
+            .setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) { 
+                    entry.setText("");
+                }
+            })
+            .show();
+            
+            return;
+        }
+        
+        if (!Utils.checkClassName(newClass)) {
+            new AlertDialog.Builder(context)
+            .setTitle(resources.getString(R.string.add_class_invalid_title))
+            .setMessage(resources.getString(R.string.add_class_invalid_message, newClass))
+            .setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) { 
+                    // do nothing
+                }
+            })
+            .show();
+            
+            return;
+        }
+        
+        if (mClasses.keySet().contains(newClass)) {
+            new AlertDialog.Builder(context)
+            .setTitle(resources.getString(R.string.add_class_duplicate_title))
+            .setMessage(resources.getString(R.string.add_class_duplicate_message, newClass))
+            .setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) { 
+                    entry.setText("");
+                }
+            })
+            .show();
+            
+            return;
+        }
+        
+        entry.setText("");
+        
+        TableLayout table = (TableLayout) findViewById(R.id.class_table);
+        
+        TableRow divider = (TableRow) getLayoutInflater().inflate(R.layout.row_divider, null);
+        if (mClasses.size() == 0) {
+            table.addView(divider);
+            divider = (TableRow) getLayoutInflater().inflate(R.layout.row_divider, null);
+        }
+        
+        TableRow row = (TableRow) getLayoutInflater().inflate(R.layout.class_row, null);
+        TextView className = (TextView) row.findViewById(R.id.class_name);
+        className.setText(newClass);
         table.addView(row);
         
         LinearLayout classSelector = (LinearLayout) row.findViewById(R.id.delete_class);
@@ -188,104 +179,104 @@ public class HomeActivity extends Activity {
         done.setOnClickListener(mStatusListener);
         
         todo.setBackgroundColor(resources.getColor(R.color.table_select));
-    	
+        
         table.addView(divider);
         
         mClasses.put(newClass, Utils.CLASS_TODO);
-    	Utils.updateLocalClasses(context, mClasses);
-    	SharedPreferences prefs =
-        		PreferenceManager.getDefaultSharedPreferences(context);
-    	Utils.setClasses(prefs.getString(Utils.URL_KEY, null), mClasses, null);
+        Utils.updateLocalClasses(context, mClasses);
+        SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(context);
+        Utils.setClasses(prefs.getString(Utils.URL_KEY, null), mClasses, null);
     }
     
     public void findPeople(View v) {
-    	Intent intent = new Intent(this, SearchActivity.class);
+        Intent intent = new Intent(this, SearchActivity.class);
         startActivity(intent);
     }
     
     private final View.OnClickListener mStatusListener = new View.OnClickListener() {
-    	@Override
-    	public void onClick(View v) {
-    		Object tag = v.getTag();
-    		TableRow row = (TableRow) v.getParent();
-    		String className = ((TextView) row.findViewById(R.id.class_name)).getText().toString();
-    		
-    		String oldStatus = mClasses.get(className);
-    		if (oldStatus != null && !oldStatus.equals(tag)) {
-    			LinearLayout todo = (LinearLayout) row.findViewById(R.id.todo);
+        @Override
+        public void onClick(View v) {
+            Object tag = v.getTag();
+            TableRow row = (TableRow) v.getParent();
+            String className = ((TextView) row.findViewById(R.id.class_name)).getText().toString();
+            
+            String oldStatus = mClasses.get(className);
+            if (oldStatus != null && !oldStatus.equals(tag)) {
+                LinearLayout todo = (LinearLayout) row.findViewById(R.id.todo);
                 LinearLayout started = (LinearLayout) row.findViewById(R.id.started);
                 LinearLayout done = (LinearLayout) row.findViewById(R.id.done);
-    			
-    			if (Utils.CLASS_TODO.equals(tag)) {
-                	todo.setBackgroundColor(resources.getColor(R.color.table_select));
-                	started.setBackgroundColor(0x00000000);
-                	done.setBackgroundColor(0x00000000);
-                	
-                	mClasses.put(className, Utils.CLASS_TODO);
-                	Utils.updateLocalClasses(context, mClasses);
+                
+                if (Utils.CLASS_TODO.equals(tag)) {
+                    todo.setBackgroundColor(resources.getColor(R.color.table_select));
+                    started.setBackgroundColor(0x00000000);
+                    done.setBackgroundColor(0x00000000);
+                    
+                    mClasses.put(className, Utils.CLASS_TODO);
+                    Utils.updateLocalClasses(context, mClasses);
                 } else if (Utils.CLASS_STARTED.equals(tag)) {
-                	todo.setBackgroundColor(0x00000000);
-                	started.setBackgroundColor(resources.getColor(R.color.table_select));
-                	done.setBackgroundColor(0x00000000);
-                	
-                	mClasses.put(className, Utils.CLASS_STARTED);
-                	Utils.updateLocalClasses(context, mClasses);
+                    todo.setBackgroundColor(0x00000000);
+                    started.setBackgroundColor(resources.getColor(R.color.table_select));
+                    done.setBackgroundColor(0x00000000);
+                    
+                    mClasses.put(className, Utils.CLASS_STARTED);
+                    Utils.updateLocalClasses(context, mClasses);
                 } else if (Utils.CLASS_DONE.equals(tag)) {
-                	todo.setBackgroundColor(0x00000000);
-                	started.setBackgroundColor(0x00000000);
-                	done.setBackgroundColor(resources.getColor(R.color.table_select));
-                	
-                	mClasses.put(className, Utils.CLASS_DONE);
-                	Utils.updateLocalClasses(context, mClasses);
+                    todo.setBackgroundColor(0x00000000);
+                    started.setBackgroundColor(0x00000000);
+                    done.setBackgroundColor(resources.getColor(R.color.table_select));
+                    
+                    mClasses.put(className, Utils.CLASS_DONE);
+                    Utils.updateLocalClasses(context, mClasses);
                 }
-    			
-    			SharedPreferences prefs =
-    	        		PreferenceManager.getDefaultSharedPreferences(context);
-            	Utils.setClasses(prefs.getString(Utils.URL_KEY, null), mClasses, null);
-    		}
-    	}
+                
+                SharedPreferences prefs =
+                        PreferenceManager.getDefaultSharedPreferences(context);
+                Utils.setClasses(prefs.getString(Utils.URL_KEY, null), mClasses, null);
+            }
+        }
     };
     
     private class ClassListener implements View.OnClickListener {
-    	private final View mView;
-    	
-    	public ClassListener(View v) {
-    		mView = v;
-    	}
+        private final View mView;
+        
+        public ClassListener(View v) {
+            mView = v;
+        }
 
-    	@Override
-		public void onClick(View v) {
-    		final TableRow row = (TableRow) mView.getParent();
-			final ViewGroup table = (ViewGroup) row.getParent();
-			final String className =
-					((TextView) row.findViewById(R.id.class_name)).getText().toString();
-			
-			new AlertDialog.Builder(context)
-    		.setTitle(resources.getString(R.string.delete_class_confirm_title))
-    		.setMessage(resources.getString(R.string.delete_class_confirm_message, className))
-    		.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-    			public void onClick(DialogInterface dialog, int which) { 
-    				mClasses.remove(className);
-        			Utils.updateLocalClasses(context, mClasses);
-        			SharedPreferences prefs =
-        	        		PreferenceManager.getDefaultSharedPreferences(context);
-                	Utils.setClasses(prefs.getString(Utils.URL_KEY, null), mClasses, null);
-        			
-        			if (mClasses.size() == 0) {
-        				table.removeAllViews();
-        			} else {
-        				View divider = table.getChildAt(table.indexOfChild(row) + 1);
-            			table.removeView(row);
-            			table.removeView(divider);
-        			}
-    			}
-    		})
-    		.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-    			public void onClick(DialogInterface dialog, int which) { 
-    				// do nothing
-    			}
-    		})
-    		.show();
-		}
+        @Override
+        public void onClick(View v) {
+            final TableRow row = (TableRow) mView.getParent();
+            final ViewGroup table = (ViewGroup) row.getParent();
+            final String className =
+                    ((TextView) row.findViewById(R.id.class_name)).getText().toString();
+            
+            new AlertDialog.Builder(context)
+            .setTitle(resources.getString(R.string.delete_class_confirm_title))
+            .setMessage(resources.getString(R.string.delete_class_confirm_message, className))
+            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) { 
+                    mClasses.remove(className);
+                    Utils.updateLocalClasses(context, mClasses);
+                    SharedPreferences prefs =
+                            PreferenceManager.getDefaultSharedPreferences(context);
+                    Utils.setClasses(prefs.getString(Utils.URL_KEY, null), mClasses, null);
+                    
+                    if (mClasses.size() == 0) {
+                        table.removeAllViews();
+                    } else {
+                        View divider = table.getChildAt(table.indexOfChild(row) + 1);
+                        table.removeView(row);
+                        table.removeView(divider);
+                    }
+                }
+            })
+            .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) { 
+                    // do nothing
+                }
+            })
+            .show();
+        }
     };
 }

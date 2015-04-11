@@ -8,23 +8,23 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 
 public class NotificationHandler extends Activity {
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		
-		String action = (String) getIntent().getExtras().get("action");
-		if (action != null) {
-			if (action.equals("disconnect")) {
-				SharedPreferences prefs =
-		        		PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-				Editor editor = prefs.edit();
-				editor.putBoolean(LocationService.ONLINE_KEY, false);
-				editor.commit();
-				
-				stopService(new Intent(this, LocationService.class));
-			}
-		}
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        
+        String action = (String) getIntent().getExtras().get("action");
+        if (action != null) {
+            if (action.equals("disconnect")) {
+                SharedPreferences prefs =
+                        PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                Editor editor = prefs.edit();
+                editor.putBoolean(LocationService.ONLINE_KEY, false);
+                editor.commit();
+                
+                stopService(new Intent(this, LocationService.class));
+            }
+        }
 
-		finish();
-	}
+        finish();
+    }
 }

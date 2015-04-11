@@ -7,14 +7,14 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 public class BootReceiver extends BroadcastReceiver {
-	@Override
-	public void onReceive(Context context, Intent intent) {
-		if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction())) {
-			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-			if (prefs.getBoolean(LocationService.ONLINE_KEY, true)) {
-				Intent pushIntent = new Intent(context, LocationService.class);
-				context.startService(pushIntent);
-			}
-		}
-	}
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction())) {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+            if (prefs.getBoolean(LocationService.ONLINE_KEY, true)) {
+                Intent pushIntent = new Intent(context, LocationService.class);
+                context.startService(pushIntent);
+            }
+        }
+    }
 }

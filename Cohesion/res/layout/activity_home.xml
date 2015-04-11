@@ -1,61 +1,61 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:tools="http://schemas.android.com/tools"
-	android:layout_width="match_parent"
-	android:layout_height="match_parent"
-	tools:context="com.cohesionmit.cohesion.HomeActivity" >
-	
-	<LinearLayout 
-	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content"
-	    android:paddingLeft="@dimen/activity_horizontal_margin"
-	    android:paddingRight="@dimen/activity_horizontal_margin"
-	    android:paddingTop="@dimen/activity_vertical_margin"
-	    android:orientation="vertical" >
-	
-	    <TableLayout
-		    android:id="@+id/class_table"
-		    android:layout_width="match_parent"
-		    android:layout_height="wrap_content" >
-		
-		    
-		</TableLayout>
-		
-	    <RelativeLayout
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:layout_marginTop="20dp" >
-	
-	        <EditText
-	            android:id="@+id/add_class"
-	            android:layout_width="match_parent"
-	            android:layout_height="wrap_content"
-	            android:layout_toLeftOf="@+id/add_button"
-	            android:singleLine="true"
-    			android:lines="1"
-    			android:maxLines="1"
-    			android:inputType="text"
-	            android:hint="@string/add_class_hint" />
-	
-	        <Button
-	            android:id="@+id/add_button"
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	            android:minHeight="0dp"
-	            android:layout_alignParentRight="true"
-	            android:background="@drawable/button"
-	            android:text="@string/add_class_button"
-	            android:onClick="addClass" />
-	    </RelativeLayout>
-	    
-	    <Button
-	        android:id="@+id/find_button"
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:minHeight="0dp"
-	        android:layout_marginTop="20dp"
-	        android:background="@drawable/button"
-	        android:text="@string/find_people_button"
-	        android:onClick="findPeople" />
-	
-	</LinearLayout>
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.cohesionmit.cohesion.HomeActivity" >
+    
+    <LinearLayout 
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:orientation="vertical" >
+    
+        <TableLayout
+            android:id="@+id/class_table"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+        
+            
+        </TableLayout>
+        
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp" >
+    
+            <EditText
+                android:id="@+id/add_class"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toLeftOf="@+id/add_button"
+                android:singleLine="true"
+                android:lines="1"
+                android:maxLines="1"
+                android:inputType="text"
+                android:hint="@string/add_class_hint" />
+    
+            <Button
+                android:id="@+id/add_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="0dp"
+                android:layout_alignParentRight="true"
+                android:background="@drawable/button"
+                android:text="@string/add_class_button"
+                android:onClick="addClass" />
+        </RelativeLayout>
+        
+        <Button
+            android:id="@+id/find_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="0dp"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/button"
+            android:text="@string/find_people_button"
+            android:onClick="findPeople" />
+    
+    </LinearLayout>
 </ScrollView>
