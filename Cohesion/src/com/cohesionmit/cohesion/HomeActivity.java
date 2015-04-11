@@ -94,9 +94,9 @@ public class HomeActivity extends Activity {
     public void addClass(View v) {
     	final EditText entry = (EditText) findViewById(R.id.add_class);
     	
-    	String newClass = entry.getText().toString().trim();
+    	String newClass = entry.getText().toString().trim().toUpperCase();
     	
-    	if (newClass == null || newClass.length() == 0) {
+    	if (newClass.length() == 0) {
     		new AlertDialog.Builder(context)
 			.setTitle(resources.getString(R.string.add_class_no_name_title))
 			.setMessage(resources.getString(R.string.add_class_no_name_message))
