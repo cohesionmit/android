@@ -4,6 +4,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -17,10 +18,12 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.GestureDetector;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnKeyListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -43,6 +46,19 @@ public class HomeActivity extends Activity {
         context = this;
         resources = context.getResources();
         mClasses = Utils.getLocalClasses(this);
+        
+        EditText classEntry = (EditText) findViewById(R.id.add_class);
+        classEntry.setOnKeyListener(new OnKeyListener() {
+        	public boolean onKey(View v, int keyCode, KeyEvent event) {
+        		if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
+        				(keyCode == KeyEvent.KEYCODE_ENTER)) {
+        			addClass(v);
+        			return true;
+        		}
+
+        		return false;
+        	}
+        });
         
         if (mClasses.size() == 0) {
         	return;
