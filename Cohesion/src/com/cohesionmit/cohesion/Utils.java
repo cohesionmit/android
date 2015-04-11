@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -159,8 +160,8 @@ public class Utils {
 	}
 	
 	private static Map<String, String> classSetToMap(Set<String> set) {
-		TreeMap<String, String> classMap = new HashMap<String, String>(new Comparator<String>(){					@Override
-			int compare(String s, String t){
+		TreeMap<String, String> classMap = new TreeMap<String, String>(new Comparator<String>(){					@Override
+			public int compare(String s, String t){
 				int i = Integer.parseInt(s.substring(0,s.indexOf('.')),36)
 					-Integer.parseInt(t.substring(0,t.indexOf('.')),36);
 				if(i!=0) return i;
@@ -168,7 +169,7 @@ public class Utils {
 					-Integer.parseInt(t.substring(1+t.indexOf('.')),36);
 			}
 			@Override
-			boolean equals(Object o){
+			public boolean equals(Object o){
 				return false;
 			}
 		});

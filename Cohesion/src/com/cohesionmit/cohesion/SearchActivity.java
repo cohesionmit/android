@@ -100,7 +100,7 @@ public class SearchActivity extends ActionBarActivity {
 				JSONArray classesJSON = o.getJSONArray("classes");
 				
 				SortedMap<String, String> classes = new TreeMap<String, String>(new Comparator<String>(){					@Override
-					int compare(String s, String t){
+					public int compare(String s, String t){
 						int i = Integer.parseInt(s.substring(0,s.indexOf('.')),36)
 							-Integer.parseInt(t.substring(0,t.indexOf('.')),36);
 						if(i!=0) return i;
@@ -108,7 +108,7 @@ public class SearchActivity extends ActionBarActivity {
 							-Integer.parseInt(t.substring(1+t.indexOf('.')),36);
 					}
 					@Override
-					boolean equals(Object o){
+					public boolean equals(Object o){
 						return false;
 					}
 				});

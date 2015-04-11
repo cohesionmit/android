@@ -27,14 +27,14 @@ import android.widget.TextView;
 public class HomeActivity extends ActionBarActivity {
 	
 	private Context context;
-	private SortedMap<String, String> mClasses;
+	private Map<String, String> mClasses;
 	
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         context = this;
-        mClasses = new TreeMap<String, String>(Utils.getLocalClasses(this));
+        mClasses = Utils.getLocalClasses(this);
         
         if (mClasses.size() == 0) {
         	return;

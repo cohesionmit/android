@@ -36,3 +36,6 @@ Cohesion/proguard/
 
 # Probably don't need to share Eclipse-specific stuff at all?
 .metadata/
+
+# Keystore is probably not supposed to be public
+keystore.jks
