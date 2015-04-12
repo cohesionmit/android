@@ -23,7 +23,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -39,7 +38,7 @@ public class SearchActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_search);
+        setContentView(R.layout.activity_search_loading);
         context = this;
         
         SharedPreferences prefs =
@@ -58,9 +57,7 @@ public class SearchActivity extends Activity {
     }
     
     private void showSearchResults(List<JSONObject> list) {
-        View message = findViewById(R.id.status_message);
-        ViewGroup parent = (ViewGroup) message.getParent();
-        parent.removeView(message);
+        setContentView(R.layout.activity_search);
         
         TableLayout table = (TableLayout) findViewById(R.id.people_table);
         TableRow divider = (TableRow) getLayoutInflater().inflate(R.layout.row_divider, null);
