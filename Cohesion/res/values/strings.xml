@@ -30,6 +30,9 @@
     
     <string name="find_people_button">Find People Working Near You</string>
     
+    <string name="feedback_button">Submit Feedback</string>
+    <string name="feedback_dialog_title">Submit Feedback</string>
+    
     <string name="searching_message">Searching...</string>
     <string name="no_people_near">No one nearby.</string>
 

@@ -17,6 +17,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnKeyListener;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
@@ -29,6 +30,7 @@ public class HomeActivity extends Activity {
     private Context context;
     private Resources resources;
     private Map<String, String> mClasses;
+    private String mLink;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +39,10 @@ public class HomeActivity extends Activity {
         context = this;
         resources = context.getResources();
         mClasses = Utils.getLocalClasses(this);
+        
+        SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(context);
+        mLink = prefs.getString(Utils.URL_KEY, null);
         
         EditText classEntry = (EditText) findViewById(R.id.add_class);
         classEntry.setOnKeyListener(new OnKeyListener() {
@@ -98,6 +104,14 @@ public class HomeActivity extends Activity {
             divider = (TableRow) getLayoutInflater().inflate(R.layout.row_divider, null);
             table.addView(divider);
         }
+        
+        findViewById(R.id.container).requestFocus();
+    }
+    
+    @Override
+    protected void onResume() {
+        super.onResume();
+        findViewById(R.id.container).requestFocus();
     }
     
     public void addClass(View v) {
@@ -184,14 +198,38 @@ public class HomeActivity extends Activity {
         
         mClasses.put(newClass, Utils.CLASS_TODO);
         Utils.updateLocalClasses(context, mClasses);
-        SharedPreferences prefs =
-                PreferenceManager.getDefaultSharedPreferences(context);
-        Utils.setClasses(prefs.getString(Utils.URL_KEY, null), mClasses, null);
+        Utils.setClasses(mLink, mClasses, null);
     }
     
     public void findPeople(View v) {
         Intent intent = new Intent(this, SearchActivity.class);
         startActivity(intent);
+    }
+    
+    public void feedback(View v) {
+        final EditText textEntry = new EditText(context);
+        
+        new AlertDialog.Builder(context)
+        .setTitle(resources.getString(R.string.feedback_dialog_title))
+        .setView(textEntry)
+        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) { 
+                String text = textEntry.getText().toString().trim();
+                if (text.length() != 0) {
+                    Utils.feedback(mLink, text, null);
+                }
+                
+                findViewById(R.id.container).requestFocus();
+            }
+        })
+        .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) { 
+                findViewById(R.id.container).requestFocus();
+            }
+        })
+        .show();
     }
     
     private final View.OnClickListener mStatusListener = new View.OnClickListener() {
@@ -230,9 +268,7 @@ public class HomeActivity extends Activity {
                     Utils.updateLocalClasses(context, mClasses);
                 }
                 
-                SharedPreferences prefs =
-                        PreferenceManager.getDefaultSharedPreferences(context);
-                Utils.setClasses(prefs.getString(Utils.URL_KEY, null), mClasses, null);
+                Utils.setClasses(mLink, mClasses, null);
             }
         }
     };
@@ -258,9 +294,7 @@ public class HomeActivity extends Activity {
                 public void onClick(DialogInterface dialog, int which) { 
                     mClasses.remove(className);
                     Utils.updateLocalClasses(context, mClasses);
-                    SharedPreferences prefs =
-                            PreferenceManager.getDefaultSharedPreferences(context);
-                    Utils.setClasses(prefs.getString(Utils.URL_KEY, null), mClasses, null);
+                    Utils.setClasses(mLink, mClasses, null);
                     
                     if (mClasses.size() == 0) {
                         table.removeAllViews();

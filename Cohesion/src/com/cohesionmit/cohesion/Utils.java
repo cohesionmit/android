@@ -165,6 +165,21 @@ public class Utils {
         sendPost(request, json, handler);
     }
     
+    public static void feedback(String link, String message, ResponseHandler handler) {
+        HttpPost request = new HttpPost(APP_URL + "/api/feedback");
+        
+        JSONObject json = new JSONObject();
+        try {
+            json.put("fburl", link);
+            json.put("message", message);
+        } catch (JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        
+        sendPost(request, json, handler);
+    }
+    
     private static Map<String, String> classSetToMap(Set<String> set) {
         TreeMap<String, String> classMap = new TreeMap<String, String>(new ClassNameComparator());
         

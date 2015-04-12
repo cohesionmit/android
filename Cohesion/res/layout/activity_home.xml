@@ -4,13 +4,16 @@
     android:layout_height="match_parent"
     tools:context="com.cohesionmit.cohesion.HomeActivity" >
     
-    <LinearLayout 
+    <LinearLayout
+        android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_vertical_margin"
-        android:orientation="vertical" >
+        android:orientation="vertical"
+        android:focusable="true"
+        android:focusableInTouchMode="true" >
     
         <TableLayout
             android:id="@+id/class_table"
@@ -56,6 +59,16 @@
             android:background="@drawable/button"
             android:text="@string/find_people_button"
             android:onClick="findPeople" />
+        
+        <Button
+            android:id="@+id/feedback_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="0dp"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/button"
+            android:text="@string/feedback_button"
+            android:onClick="feedback" />
     
     </LinearLayout>
 </ScrollView>
