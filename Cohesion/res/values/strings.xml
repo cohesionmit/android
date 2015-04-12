@@ -8,6 +8,10 @@
     <string name="notification_title">Cohesion is Online</string>
     <string name="notification_text">Tap to go offline</string>
     
+    <string name="registration_message">Registering...</string>
+    <string name="registration_error_title">Registration Failed</string>
+    <string name="registration_error_message">Could not register with the Cohesion server. Please check your internet connection and try again.</string>
+    
     <string name="class_todo">To Do</string>
     <string name="class_started">Started</string>
     <string name="class_done">Done</string>
